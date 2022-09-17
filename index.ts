@@ -2,23 +2,24 @@ import express, { Express, Request, Response } from 'express';
 import compression from 'compression';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import router from './api/routes.js';
 import cors from 'cors';
-import * as dbConnect from './config/database/Connection.js'
+import db from './api/sequelize.js';
+import Router from './api/Router.js';
 
 dotenv.config();
 
 export const app: Express = express();
 const port: string | undefined = process.env.PORT;
+db();
 
-dbConnect.default();
+// if (process.env.NODE_ENV !== 'production') {
+//   console.log('JWT', generateToken());
+// }
 
 // compresses all the responses
 app.use(compression());
-
 // adding set of security middlewares
 app.use(helmet());
-
 // adding cors middleware
 app.use(cors());
 
@@ -26,7 +27,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/v1/', router);
+app.use('/api/v1/', Router);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}/api/v1/`);

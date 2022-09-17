@@ -1,12 +1,24 @@
-import { Request, RequestHandler, Response } from 'express';
-import { User } from '../../models/schema';
-import { execute } from '../../config/database/Connection.js';
-import { UserQueries } from '../queries/UserQueries.js';
+import sequelize from "../database/Connection.js";
 
-export const getUsers = async () => {
-  return execute<User>(UserQueries.GetUsers, []);
+export const findUserByEmail = async (email: string) => {
+  try {
+    const user = await sequelize.models.User.findAll({
+      where: {
+        email
+      }
+    });
+    return user;
+  } catch (error) {
+    return error;
+  }
 }
 
-export const getUserById = async (id: string) => {
-  return execute<User>(UserQueries.GetUserById, [id]);
+export const findUserById = async (id: number) => {
+  try {
+    const user = await sequelize.models.User.findByPk(id);
+    return user;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }

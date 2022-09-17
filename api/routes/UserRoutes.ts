@@ -1,15 +1,15 @@
-import { Router } from 'express';
-import * as UserController from '../controller/UserController.js';
+import express, { Express } from 'express';
+import { findAllUsers, findOneById, createUser, editUser, deleteUser, findAllConversationFromUser } from '../controller/UserController.js';
 
-const router = Router();
+const UserRouter: Express = express();
 
-router
-  .route('/')
-  .get(UserController.getUsers);
+UserRouter
+  .get('/', findAllUsers)
+  .get('/:id', findOneById)
+  .get('/:id/conversations', findAllConversationFromUser)
+  .post('/', createUser)
+  .put('/:id', editUser)
+  .delete('/:id', deleteUser)
 
-router
-  .route('/:id')
-  .get(UserController.getUserById);
 
-
-export default router;
+export default UserRouter;
