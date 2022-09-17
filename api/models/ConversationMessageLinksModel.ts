@@ -13,7 +13,7 @@ export const ConversationMessageLinks = sequelize.define('ConversationMessageLin
     type: INTEGER,
     allowNull: false,
   },
-  userId: {
+  messageId: {
     type: INTEGER,
     allowNull: false,
   },

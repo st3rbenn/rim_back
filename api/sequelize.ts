@@ -21,11 +21,12 @@ export default async function db() {
     const models = [User, UserConversationLinks, Conversation, UserPostLinks, Post , ConversationMessageLinks, Message];
 
     for (const model of models) {
-      await model.sync({ alter: true });
+      await model.sync({ alter: false });
       console.log(`🛫 [sequelize]: ✅ Model ${model.name} synced successfully.`);
     }
 
     User.hasMany(UserConversationLinks, { foreignKey: 'userId' });
+    User.hasMany(Message, { foreignKey: 'userId' });
     UserConversationLinks.belongsTo(User, { foreignKey: 'userId' });
 
     Conversation.hasMany(UserConversationLinks, { foreignKey: 'conversationId' });
@@ -41,10 +42,9 @@ export default async function db() {
     ConversationMessageLinks.belongsTo(Conversation, { foreignKey: 'conversationId' });
 
     Message.hasMany(ConversationMessageLinks, { foreignKey: 'messageId' });
-    Message.belongsTo(User, { foreignKey: 'userId' });
     ConversationMessageLinks.belongsTo(Message, { foreignKey: 'messageId' });
 
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ alter: false });
 
     console.log('🛫 [sequelize]: 🤌 All models synced successfully.');
 

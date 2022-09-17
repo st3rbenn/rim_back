@@ -1,6 +1,4 @@
 import sequelize from '../database/Connection.js';
-import { Request, Response } from 'express';
-import { findUserById } from '../services/UserServices.js';
 
 export const findAllConversationByUserId = async (userId: number) => {
   try {
