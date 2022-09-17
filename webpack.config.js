@@ -10,7 +10,7 @@ export const module = {
   ],
 };
 export const resolve = {
-  extensions: ['.tsx', '.ts', '.js'],
+  extensions: ['.ts', '.js'],
 };
 export const output = {
   filename: 'bundle.js',
