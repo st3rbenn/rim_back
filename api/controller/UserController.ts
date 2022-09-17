@@ -3,7 +3,6 @@ import sequelize from '../database/Connection.js';
 import { Request, Response } from 'express';
 import Bcrypt from 'bcrypt';
 import { deleteMessage, editMessage, findUserByEmail, findUserById, sendMessage } from '../services/UserServices.js';
-import { exit } from 'process';
 
 
 export const findAllUsers = async (req: Request, res: Response) => {
