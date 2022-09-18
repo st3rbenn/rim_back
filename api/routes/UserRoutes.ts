@@ -7,7 +7,6 @@ UserRouter
   .get('/', findAllUsers)
   .get('/:id', findOneById)
   .get('/:id/conversations', findAllConversationFromUser)
-  .post('/add', createUser)
   .post('/add/message', sendMessageOnConversation)
   .put('/edit/:id', editUser)
   .put('/edit/message/:id', editMessageOnConversation)

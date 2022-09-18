@@ -26,6 +26,7 @@
     "nodemon": "^2.0.19",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.22.0",
+    "sequelize-typescript-generator": "^8.4.4",
     "sqlite3": "^5.1.1",
     "tsconfig-paths": "^4.1.0",
     "typescript": "^4.7.4",
@@ -39,7 +40,7 @@
     "lint": "eslint src/**/*.{js,jsx,ts,tsx,json}",
     "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx,json}'",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json}' --config ./.prettierrc",
-    "schema": "npx mysql-schema-ts mysql://root@localhost:3306/rim > ./models/schema.ts"
+    "schema": "npx stg -D mysql -h localhost -p 3306 -d rim -u root --indices --dialect-options-file type.json --case camel --out-dir models --clean"
   },
   "eslintConfig": {},
   "devDependencies": {

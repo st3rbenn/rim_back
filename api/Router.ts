@@ -2,8 +2,11 @@ import express, { Express, Request, Response} from 'express';
 import UserRouter from './routes/UserRoutes.js';
 import ConversationRouter from './routes/ConversationRoutes.js';
 import PostRouter from './routes/PostRoutes.js';
+import AuthRouter from './routes/AuthRoutes.js';
 
 const Router: Express = express();
+
+Router.use('/auth', AuthRouter);
 
 Router.use('/post', PostRouter)
 

@@ -18,13 +18,10 @@ export const User = sequelize.define('User', {
     type: STRING(255),
     allowNull: false,
   },
-  firstName: {
+  pseudo: {
     type: STRING(50),
     allowNull: false,
-  },
-  lastName: {
-    type: STRING(50),
-    allowNull: false,
+    unique: true,
   },
   birthDate: {
     type: DATE,
