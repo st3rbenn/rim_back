@@ -3,9 +3,23 @@ import { createRelationBetweenConversationAndMessage } from "./relations/Convers
 
 export const findUserByEmail = async (email: string) => {
   try {
-    const user = await sequelize.models.User.findAll({
+    const user = await sequelize.models.User.findOne({
       where: {
         email: email
+      }
+    });
+    
+    return user;
+  } catch (error) {
+    return error;
+  }
+}
+
+export const findUserByPseudo = async (pseudo: string) => {
+  try {
+    const user = await sequelize.models.User.findAll({
+      where: {
+        pseudo: pseudo
       }
     });
     return user;

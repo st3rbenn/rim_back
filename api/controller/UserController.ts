@@ -2,7 +2,8 @@ import { findAllConversationByUserId } from './../services/ConversationServices.
 import sequelize from '../database/Connection.js';
 import { Request, Response } from 'express';
 import Bcrypt from 'bcrypt';
-import { deleteMessage, editMessage, findUserByEmail, findUserById, sendMessage } from '../services/UserServices.js';
+import { deleteMessage, editMessage, findUserByEmail, findUserById, findUserByPseudo, sendMessage } from '../services/UserServices.js';
+import { User } from '../models/UserModel.js';
 
 
 export const findAllUsers = async (req: Request, res: Response) => {
@@ -41,26 +42,38 @@ export const findOneById = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { email, password, firstName, lastName, birthDate } = req.body;
+    const { email, password, pseudo, birthDate } = req.body;
 
-    const same = await findUserByEmail(email);
-    if(Object(same).length > 0) {
+    const sameEmail = await findUserByEmail(email);
+    const samePseudo = await findUserByPseudo(pseudo);
+
+    if(Object(sameEmail).length > 0 || Object(samePseudo).length > 0) {
+
       res.status(409).json({
         message: 'User already exists'
       })
+
+    } else if(!email || !password || !pseudo || !birthDate) {
+
+      res.status(400).json({
+        message: `Missing ${!email ? 'email' : ''} ${!password ? 'password' : ''} ${!pseudo ? 'pseudo' : ''} ${!birthDate ? 'birthDate' : ''}`
+      })
+
     } else {
-      const hashedPassword = await Bcrypt.hash(password, 10);
-      const user = await sequelize.models.User.create({
+      const salt = await Bcrypt.genSalt(10);
+      const hashedPassword = await Bcrypt.hash(password, salt);
+
+      const user = await User.create({
         email,
         password: hashedPassword,
-        firstName,
-        lastName,
+        pseudo,
         birthDate
       });
+
       res.status(201).json({
-        message: 'User created successfully',
+        message: 'User created',
         user
-      })
+      });
     }
   } catch (error) {
     res.status(500).json({
@@ -73,15 +86,14 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const editUser = async (req: Request, res: Response) => {
   try {
-    const { email, password, firstName, lastName, birthDate } = req.body;
+    const { email, password, pseudo, birthDate } = req.body;
 
     if (password) {
       const hashedPassword = await Bcrypt.hash(password, 10);
       const user = await sequelize.models.User.update({
         email,
         password: hashedPassword,
-        firstName,
-        lastName,
+        pseudo,
         birthDate
       }, {
         where: {
@@ -95,8 +107,7 @@ export const editUser = async (req: Request, res: Response) => {
     } else {
       const user = await sequelize.models.User.update({
         email,
-        firstName,
-        lastName,
+        pseudo,
         birthDate
       }, {
         where: {
