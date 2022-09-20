@@ -16,7 +16,7 @@ now run :
     touch .env
     code . //if you turn on shell command to run VSCode or open project manually
 
-then write in the .env file your local MySQL credentials like : 
+then write in the .env file your local MySQL credentials like : (first you have to create a db in MySQL) 
 
     PORT=3001
     DB_HOST=localhost
