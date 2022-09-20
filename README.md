@@ -17,8 +17,10 @@ now run :
     code . //if you turn on shell command to run VSCode or open project manually
     
 don't forget to generate a RSA/SSH key for the JWT Auth middleware : 
+
     [RSA Key for Windows 10/11](https://www.howtogeek.com/762863/how-to-generate-ssh-keys-in-windows-10-and-windows-11/)
     [SSH Key for MacOS](https://docs.tritondatacenter.com/public-cloud/getting-started/ssh-keys/generating-an-ssh-key-manually/manually-generating-your-ssh-key-in-mac-os-x)
+
 put those keys in the folder config/jwt and : 
   - rename the private key to "mykey"
   - rename the public key to pubkey"
