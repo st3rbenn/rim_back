@@ -2,8 +2,8 @@
 ([link to the mobile app](https://github.com/st3rbenn/rim_web))
 > Rim for Receive Instant Message
 ## What's this project ?
-It's a mobile app where you can follow, share message and post with your friend simply and quickly
-The goal of this project was to learn how to create an api using MySQL, Node.JS, Express, Sequelize and JWT.
+It's a mobile app where you can follow, share message and post with your friend simply and quickly and 
+the goal of this project was to learn how to create an api using MySQL, Node.JS, Express, Sequelize and JWT.
 
 ## How to install and run The API
 First you need to clone this project running this command : 
