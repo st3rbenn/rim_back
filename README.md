@@ -6,7 +6,7 @@ It's a mobile app where you can follow, share message and post with your friend 
 the goal of this project was to learn how to create an api using MySQL, Node.JS, Express, Sequelize and JWT.
 
 ## How to install and run The API
-First you need to clone this project running this command : 
+First you need to clone the project running this command : 
 
     git clone https://github.com/st3rbenn/rim_back
 
@@ -15,6 +15,13 @@ now run :
     cd rim_back
     touch .env
     code . //if you turn on shell command to run VSCode or open project manually
+    
+don't forget to generate a RSA/SSH key for the JWT Auth middleware : 
+    [RSA Key for Windows 10/11](https://www.howtogeek.com/762863/how-to-generate-ssh-keys-in-windows-10-and-windows-11/)
+    [SSH Key for MacOS](https://docs.tritondatacenter.com/public-cloud/getting-started/ssh-keys/generating-an-ssh-key-manually/manually-generating-your-ssh-key-in-mac-os-x)
+put those keys in the folder config/jwt and : 
+  - rename the private key to "mykey"
+  - rename the public key to pubkey"
 
 then write in the .env file your local MySQL credentials like : (first you have to create a db in MySQL) 
 
