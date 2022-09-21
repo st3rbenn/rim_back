@@ -9,14 +9,6 @@ export const Conversation = sequelize.define('Conversation', {
     primaryKey: true,
     autoIncrement: true,
   },
-  createdAt: {
-    type: DATE,
-    defaultValue: new Date()
-  },
-  updatedAt: {
-    type: DATE,
-    defaultValue: new Date()
-  }
 }, {
   tableName: 'conversation',
   underscored: true

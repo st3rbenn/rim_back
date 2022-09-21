@@ -1,43 +1,6 @@
 import sequelize from "../database/Connection.js";
 import { createRelationBetweenConversationAndMessage } from "./relations/ConversationMessageServices.js";
 
-export const findUserByEmail = async (email: string) => {
-  try {
-    const user = await sequelize.models.User.findOne({
-      where: {
-        email: email
-      }
-    });
-    
-    return user;
-  } catch (error) {
-    return error;
-  }
-}
-
-export const findUserByPseudo = async (pseudo: string) => {
-  try {
-    const user = await sequelize.models.User.findAll({
-      where: {
-        pseudo: pseudo
-      }
-    });
-    return user;
-  } catch (error) {
-    return error;
-  }
-}
-
-export const findUserById = async (id: number) => {
-  try {
-    const user = await sequelize.models.User.findByPk(id);
-    return user;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-
 export const sendMessage = async (conversationId: number, userId: number, messageSend: string) => {
   try {
     const message = await sequelize.models.Message.create({
