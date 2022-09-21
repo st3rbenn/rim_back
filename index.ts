@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import db from './api/sequelize.js';
 import Router from './api/Router.js';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ app.use(helmet());
 // adding cors middleware
 app.use(cors());
 
+app.use(cookieParser());
+
 // adding body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,5 +33,5 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1/', Router);
 
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}/api/v1/`);
+  console.log(`⚡️[server]: Server is running ...`);
 });

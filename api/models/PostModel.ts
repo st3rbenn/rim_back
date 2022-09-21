@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../database/Connection.js';
 
-const { INTEGER, TEXT, DATE } = DataTypes;
+const { INTEGER, TEXT } = DataTypes;
 
 export const Post = sequelize.define('Post', {
   id: {
@@ -9,19 +9,9 @@ export const Post = sequelize.define('Post', {
     primaryKey: true,
     autoIncrement: true,
   },
-  message: {
+  content: {
     type: TEXT,
     allowNull: false
-  },
-  createdAt: {
-    type: DATE,
-    allowNull: false,
-    defaultValue: new Date(),
-  },
-  updatedAt: {
-    type: DATE,
-    allowNull: false,
-    defaultValue: new Date(),
   },
 }, {
   tableName: 'post',

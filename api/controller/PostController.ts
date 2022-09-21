@@ -1,15 +1,28 @@
-import { UserPostLinks } from './../models/UserPostLinksModel';
 import sequelize from '../database/Connection.js';
 import { Request, Response } from 'express';
 import { createRelationsBetweenUserAndPost } from '../services/relations/UserPostServices.js';
+import { Post } from '../models/PostModel.js';
+import { UserPostLinks } from '../models/UserPostLinksModel.js';
 
 export const findAllPosts = async (req: Request, res: Response) => {
+  let canAllPostsBeFound = true;
   try {
-    const posts = await sequelize.models.Post.findAll();
-    res.status(200).json({
-      message: 'Posts retrieved successfully',
-      posts
-    })
+    const posts = await Post.findAll();
+
+    if(!posts) {
+      res.status(400).json({
+        message: 'No posts found'
+      })
+      canAllPostsBeFound = false;
+    }
+
+    if(canAllPostsBeFound) {
+      res.status(200).json({
+        message: 'Posts retrieved successfully',
+        posts
+      })
+    }
+
   } catch (error) {
     res.status(500).json({
       message: 'Error retrieving posts',
@@ -20,17 +33,36 @@ export const findAllPosts = async (req: Request, res: Response) => {
 }
 
 export const findPostById = async (req: Request, res: Response) => {
+  let canFindPostById = true;
   try {
     const { id } = req.params;
-    const post = await sequelize.models.Post.findOne({
+
+    if(!id) {
+      res.status(400).json({
+        message: `Missing parameters : post id`
+      });
+      canFindPostById = false;
+    }
+
+    const post = await Post.findOne({
       where: {
         id: id
       }
     });
-    res.status(200).json({
-      message: 'Post retrieved successfully',
-      post
-    })
+
+    if(!post) {
+      res.status(400).json({
+        message: `No post found with this id`
+      });
+      canFindPostById = false;
+    }
+
+    if(canFindPostById) {
+      res.status(200).json({
+        message: 'Post retrieved successfully',
+        post
+      })
+    }
   } catch (error) {
     res.status(500).json({
       message: 'Error retrieving post',
@@ -41,28 +73,46 @@ export const findPostById = async (req: Request, res: Response) => {
 }
 
 export const findPostsByUserId = async (req: Request, res: Response) => {
+  let canFindPostByUserId = true;
   try {
     const { userId } = req.body;
-    console.log(userId);
-    const posts = await sequelize.models.UserPostLinks.findAll({
+
+    if(!userId) {
+      canFindPostByUserId = false;
+      return res.status(400).json({
+        message: `Missing parameters : user id`
+      });
+    }
+
+    const posts = await UserPostLinks.findAll({
       where: {
         userId: userId
       }
     });
-    const allPosts: any = [];
-    for (const post of posts) {
-      const postFound = await sequelize.models.Post.findOne({
-        where: {
-          id: Object(post).dataValues.postId
-        }
+
+    if(!posts) {
+      canFindPostByUserId = false;
+      return res.status(400).json({
+        message: `No posts found for this user`
       });
-      allPosts.push(postFound);
     }
 
-    res.status(200).json({
-      message: 'Posts retrieved successfully',
-      allPosts
-    })
+    if(canFindPostByUserId){
+      const allPosts: any = [];
+      for (const post of posts) {
+        const postFound = await Post.findOne({
+          where: {
+            id: Object(post).dataValues.postId
+          }
+        });
+        allPosts.push(postFound);
+      }
+
+      res.status(200).json({
+        message: 'Posts retrieved successfully',
+        allPosts
+      })
+    }
   } catch (error) {
     res.status(500).json({
       message: 'Error retrieving posts',
@@ -73,17 +123,34 @@ export const findPostsByUserId = async (req: Request, res: Response) => {
 }
 
 export const createPost = async (req: Request, res: Response) => {
+  let canCreatePost = true;
   try {
-    const { message, userId } = req.body;
-    const post = await sequelize.models.Post.create({
-      message
-    });
+    const reqBody = {
+      ...req.body
+    };
 
-    await createRelationsBetweenUserAndPost(userId, Object(post).id);
-    res.status(200).json({
-      message: 'Post created successfully',
-      post
-    })
+    for(const [key, value] of Object.entries(reqBody)) {
+      if(!value) {
+        canCreatePost = false;
+        return res.status(400).json({
+          message: `Missing param : ${key}`
+        })
+      }
+    }
+    
+    if(canCreatePost){
+
+      const post = await Post.create({
+        content: reqBody.content
+      });
+  
+      await createRelationsBetweenUserAndPost(reqBody.userId, Object(post).id);
+
+      res.status(200).json({
+        message: 'Post created successfully',
+        post
+      })
+    }
   } catch (error) {
     res.status(500).json({
       message: 'Error creating post',
@@ -94,30 +161,47 @@ export const createPost = async (req: Request, res: Response) => {
 }
 
 export const editPost = async (req: Request, res: Response) => {
+  let canEditPost = true;
   try {
-    const { message, postId, userId } = req.body;
-    const posts = await sequelize.models.UserPostLinks.findAll({
+    const reqBody = {
+      ...req.body
+    };
+
+    for(const [key, value] of Object.entries(reqBody)) {
+      if(!value) {
+        canEditPost = false;
+        return res.status(400).json({
+          message: `Missing param : ${key}`
+        })
+      }
+    }
+
+    const post = await UserPostLinks.findOne({
       where: {
-        userId: userId,
-        postId: postId
+        userId: reqBody.userId,
+        postId: reqBody.postId
       }
     });
 
-    if(Object(posts).length > 0) {
-      const post = await sequelize.models.Post.update({
-        message
+    if(!post) {
+      canEditPost = false;
+      return res.status(400).json({
+        message: `No post found for this user and this post id`
+      });
+    }
+
+    if(canEditPost) {
+      const postUpdated = await Post.update({
+        content: reqBody.content
       }, {
         where: {
-          id: postId
+          id: reqBody.postId
         }
       });
+
       res.status(200).json({
         message: 'Post updated successfully',
-        post
-      })
-    } else {
-      res.status(404).json({
-        message: 'Post not found'
+        postUpdated
       })
     }
   } catch (error) {
@@ -130,28 +214,51 @@ export const editPost = async (req: Request, res: Response) => {
 }
 
 export const deletePost = async (req: Request, res: Response) => {
+  let canDeletePost = true;
   try {
-    const { postId, userId } = req.body;
-    const posts = await sequelize.models.UserPostLinks.findAll({
+    const reqBody = {
+      ...req.body
+    };
+
+    for(const [key, value] of Object.entries(reqBody)) {
+      if(!value) {
+        canDeletePost = false;
+        return res.status(400).json({
+          message: `Missing param : ${key}`
+        })
+      }
+    }
+
+    const posts = await UserPostLinks.findOne({
       where: {
-        userId: userId,
-        postId: postId
+        userId: reqBody.userId,
+        postId: reqBody.postId
       }
     });
 
-    if(Object(posts).length > 0) {
-      const post = await sequelize.models.Post.destroy({
+    if(!posts) {
+      canDeletePost = false;
+      return res.status(400).json({
+        message: `No post found for this user and this post id`
+      });
+    }
+
+    if(canDeletePost) {
+      await UserPostLinks.destroy({
         where: {
-          id: postId
+          userId: reqBody.userId,
+          postId: reqBody.postId
         }
       });
+
+      await Post.destroy({
+        where: {
+          id: reqBody.postId
+        }
+      });
+
       res.status(200).json({
-        message: 'Post deleted successfully',
-        post
-      })
-    } else {
-      res.status(404).json({
-        message: 'Post not found'
+        message: 'Post deleted successfully'
       })
     }
   } catch (error) {

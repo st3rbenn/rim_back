@@ -1,4 +1,3 @@
-import { Sequelize } from 'sequelize';
 import sequelize from './database/Connection.js';
 import * as dotenv from 'dotenv';
 import { User } from './models/UserModel.js';
@@ -10,6 +9,7 @@ import { UserPostLinks } from './models/UserPostLinksModel.js';
 import { ConversationMessageLinks } from './models/ConversationMessageLinksModel.js';
 
 dotenv.config();
+const port: string | undefined = process.env.PORT;
 
 export default async function db() {
   try {
@@ -20,9 +20,10 @@ export default async function db() {
 
     const models = [User, UserConversationLinks, Conversation, UserPostLinks, Post , ConversationMessageLinks, Message];
 
-    for (const model of models) {
+    for (let model of models) {
       await model.sync({ alter: false });
       console.log(`🛫 [sequelize]: ✅ Model ${model.name} synced successfully.`);
+      console.log('🛫 [sequelize]: 🤌 All models synced successfully.');
     }
 
     User.hasMany(UserConversationLinks, { foreignKey: 'userId' });
@@ -44,9 +45,23 @@ export default async function db() {
     Message.hasMany(ConversationMessageLinks, { foreignKey: 'messageId' });
     ConversationMessageLinks.belongsTo(Message, { foreignKey: 'messageId' });
 
+    UserConversationLinks.removeAttribute('id');
+    UserPostLinks.removeAttribute('id');
+    ConversationMessageLinks.removeAttribute('id');
+
     await sequelize.sync({ alter: false });
 
-    console.log('🛫 [sequelize]: 🤌 All models synced successfully.');
+    console.log('🛫 [sequelize]: 🤌 All associations synced successfully.');
+    console.log(`
+      ██████╗     ██╗    ███╗   ███╗          █████╗  ██████╗  ██╗
+      ██╔══██╗    ██║    ████╗ ████║         ██╔══██╗ ██╔══██╗ ██║
+      ██████╔╝    ██║    ██╔████╔██║         ███████║ ██████╔╝ ██║
+      ██╔══██╗    ██║    ██║╚██╔╝██║         ██╔══██║ ██╔═══╝  ██║
+      ██║  ██║    ██║    ██║ ╚═╝ ██║         ██║  ██║ ██║      ██║
+      ╚═╝  ╚═╝    ╚═╝    ╚═╝     ╚═╝         ╚═╝  ╚═╝ ╚═╝      ╚═╝                                                              
+    `)
+    console.log(`⚡️ [server]: API is ready to use : http://localhost:${port}/api/v1/`);
+    
 
   } catch (error) {
     console.error('🛫 [sequelize]: ❌ Unable to connect to the database:', error);

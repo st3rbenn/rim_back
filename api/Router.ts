@@ -3,16 +3,17 @@ import UserRouter from './routes/UserRoutes.js';
 import ConversationRouter from './routes/ConversationRoutes.js';
 import PostRouter from './routes/PostRoutes.js';
 import AuthRouter from './routes/AuthRoutes.js';
+import { isAuthtenticated } from './middleware/authJwt.js';
 
 const Router: Express = express();
 
 Router.use('/auth', AuthRouter);
 
-Router.use('/post', PostRouter)
+Router.use('/post', isAuthtenticated, PostRouter)
 
-Router.use('/conversation', ConversationRouter);
+Router.use('/conversation', isAuthtenticated, ConversationRouter);
 
-Router.use('/user', UserRouter)
+Router.use('/user',  isAuthtenticated, UserRouter)
 
 Router.use('/', (req: Request, res: Response) => {
   res.status(200).json({

@@ -32,16 +32,6 @@ export const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: ["ROLE_USER"]
   },
-  createdAt: {
-    type: DATE,
-    allowNull: false,
-    defaultValue: new Date(),
-  },
-  updatedAt: {
-    type: DATE,
-    allowNull: false,
-    defaultValue: new Date(),
-  },
 }, {
   tableName: 'user',
   underscored: true,

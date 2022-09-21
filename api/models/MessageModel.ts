@@ -17,16 +17,6 @@ export const Message = sequelize.define('Message', {
     type: INTEGER,
     allowNull: false,
   },
-  createdAt: {
-    type: DATE,
-    allowNull: false,
-    defaultValue: new Date(),
-  },
-  updatedAt: {
-    type: DATE,
-    allowNull: false,
-    defaultValue: new Date(),
-  },
 }, {
   tableName: 'message',
   underscored: true,
