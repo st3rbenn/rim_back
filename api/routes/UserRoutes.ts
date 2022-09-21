@@ -10,7 +10,7 @@ UserRouter
   .post('/add/message', sendMessageOnConversation)
   .put('/edit/:id', editUser)
   .put('/edit/message/:id', editMessageOnConversation)
-  .delete('/delete/:id', deleteUser)
+  .delete('/delete', deleteUser)
   .delete('/delete/message/:id', deleteMessageOnConversation)
 
 

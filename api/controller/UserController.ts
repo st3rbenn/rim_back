@@ -73,7 +73,10 @@ export const editUser = async (req: Request, res: Response) => {
   let canUserBeEdited = true;
   try {
     const reqBody = {
-      ...req.body
+      pseudo: req.body.pseudo,
+      email: req.body.email,
+      password: req.body.password,
+      birthDate: req.body.birthDate,
     }
 
     for(const [key, value] of Object.entries(reqBody)) {
@@ -238,7 +241,9 @@ export const sendMessageOnConversation = async (req: Request, res: Response) => 
   let canMessagebeSend = true;
   try {
     const reqBody = {
-      ...req.body,
+      userId: req.body.userId,
+      conversationId: req.body.conversationId,
+      message: req.body.message
     }
     
     for(const [key, value] of Object.entries(reqBody)) {
@@ -310,7 +315,10 @@ export const editMessageOnConversation = async (req: Request, res: Response) => 
   let canUserEditMessage = true;
   try {
     const reqBody = {
-      ...req.body,
+      userId: req.body.userId,
+      conversationId: req.body.conversationId,
+      messageId: req.body.messageId,
+      message: req.body.message
     };
 
     for(const [key, value] of Object.entries(reqBody)) {
@@ -342,29 +350,29 @@ export const editMessageOnConversation = async (req: Request, res: Response) => 
     });
 
     if(!user) {
-      res.status(404).json({
+      canUserEditMessage = false;
+      return res.status(404).json({
         message: 'User not found'
       })
-      canUserEditMessage = false;
     }
 
     if(!conversation) {
-      res.status(404).json({
+      canUserEditMessage = false;
+      return res.status(404).json({
         message: 'Conversation not found'
       })
-      canUserEditMessage = false;
     }
 
     if(linksBetweenConversationAndUser.length === 0) {
-      res.status(403).json({
+      canUserEditMessage = false;
+      return res.status(403).json({
         message: 'User is not part of this conversation'
       })
-      canUserEditMessage = false;
     }
 
     if(canUserEditMessage) {
       const msg = await editMessage(reqBody.messageId, reqBody.message);
-      res.status(200).json({
+      return res.status(200).json({
         message: 'Message edited successfully',
         msg
       })
@@ -382,8 +390,10 @@ export const deleteMessageOnConversation = async (req: Request, res: Response) =
   let canMessageBeDeleted = true;
   try {
     const reqBody = {
-      ...req.body
-    }
+      userId: req.body.userId,
+      conversationId: req.body.conversationId,
+      messageId: req.body.messageId
+    };
 
     for(const [key, value] of Object.entries(reqBody)) {
       if(!value) {

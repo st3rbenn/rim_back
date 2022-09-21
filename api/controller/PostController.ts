@@ -126,7 +126,8 @@ export const createPost = async (req: Request, res: Response) => {
   let canCreatePost = true;
   try {
     const reqBody = {
-      ...req.body
+      content: req.body.content,
+      userId: req.body.userId
     };
 
     for(const [key, value] of Object.entries(reqBody)) {
@@ -164,9 +165,10 @@ export const editPost = async (req: Request, res: Response) => {
   let canEditPost = true;
   try {
     const reqBody = {
-      ...req.body
+      content: req.body.content,
+      postId: req.body.postId,
+      userId: req.body.userId
     };
-
     for(const [key, value] of Object.entries(reqBody)) {
       if(!value) {
         canEditPost = false;
@@ -217,7 +219,8 @@ export const deletePost = async (req: Request, res: Response) => {
   let canDeletePost = true;
   try {
     const reqBody = {
-      ...req.body
+      postId: req.body.postId,
+      userId: req.body.userId
     };
 
     for(const [key, value] of Object.entries(reqBody)) {

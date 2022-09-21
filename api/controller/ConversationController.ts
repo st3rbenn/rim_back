@@ -6,7 +6,7 @@ import ConversationType from '../../types/ConversationType.js';
 export const getConversation = async (req: Request, res: Response) => {
   let canConversationsBeRetrieved = true;
   try {
-    const { conversationId } = req.params;
+    const { conversationId } = req.body;
 
     if(!conversationId) {
       res.status(400).json({
@@ -42,8 +42,10 @@ export const createNewConversation = async (req: Request, res: Response) => {
   let canConversationBeCreated = true;
   try {
     const reqBody = {
-      ...req.body
+      user1Id: req.body.user1Id,
+      user2Id: req.body.user2Id
     };
+
     if(reqBody.user1Id === reqBody.user2Id) {
       res.status(409).json({
         message: 'You cannot create a conversation with yourself'

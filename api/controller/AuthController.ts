@@ -9,12 +9,14 @@ export const register = async (req: Request, res: Response) => {
   let canUserBeCreated = true;
   try {
     const reqBody = {
-      ...req.body
+      email: req.body.email,
+      password: req.body.password,
+      pseudo: req.body.pseudo,
+      birthDate: req.body.birthDate
     };
 
     for(const [key, value] of Object.entries(reqBody)) {
-      console.log(key, value);
-      
+      console.log(value);
       if(!value) {
         canUserBeCreated = false;
         return res.status(400).json({
@@ -70,8 +72,7 @@ export const register = async (req: Request, res: Response) => {
       res.cookie('token', token).json({
         message: 'User created',
         email: user.get('email'),
-        pseudo: user.get('pseudo'),
-        token
+        pseudo: user.get('pseudo')
       });
     }
   } catch (error) {
@@ -87,7 +88,8 @@ export const login = async (req: Request, res: Response) => {
   let userCanBeLogged = true;
   try {
     const reqBody = {
-      ...req.body
+      email: req.body.email,
+      password: req.body.password
     };
 
     for(const [key, value] of Object.entries(reqBody)) {
@@ -108,7 +110,7 @@ export const login = async (req: Request, res: Response) => {
       }
     });
     // @ts-ignore
-    const passwordIsValid = bcrypt.compare(password, user.password as string);
+    const passwordIsValid = bcrypt.compare(reqBody.password, user.password as string);
     
 
     if(!user) {
