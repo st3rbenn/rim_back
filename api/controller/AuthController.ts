@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import UserType from '../../types/UserType';
-import { Request, Response } from 'express';
-import { User } from '../models/UserModel.js';
+import {Request, Response} from 'express';
+import {User} from '../models/UserModel.js';
 import * as fs from 'fs';
 
 export const register = async (req: Request, res: Response) => {
@@ -12,46 +12,46 @@ export const register = async (req: Request, res: Response) => {
       email: req.body.email,
       password: req.body.password,
       pseudo: req.body.pseudo,
-      birthDate: req.body.birthDate
+      firstname: req.body.firstname,
+      birthDate: req.body.birthDate,
     };
 
-    for(const [key, value] of Object.entries(reqBody)) {
-      console.log(value);
-      if(!value) {
+    for (const [key, value] of Object.entries(reqBody)) {
+      if (!value) {
         canUserBeCreated = false;
         return res.status(400).json({
-          message: `The ${key} is required`
-        })
+          message: `The ${key} is required`,
+        });
       }
     }
 
     const sameEmail: UserType | null = await User.findOne({
       where: {
-        email: reqBody.email
-      }
+        email: reqBody.email,
+      },
     });
 
     const samePseudo: UserType | null = await User.findOne({
       where: {
-        pseudo: reqBody.pseudo
-      }
+        pseudo: reqBody.pseudo,
+      },
     });
 
-    if(sameEmail) {
+    if (sameEmail) {
       res.status(409).json({
-        message: 'User with this email already exists'
-      })
+        message: 'User with this email already exists',
+      });
       canUserBeCreated = false;
-    } 
-    
-    if(samePseudo) {
+    }
+
+    if (samePseudo) {
       res.status(409).json({
-        message: 'User with this pseudo already exists'
-      })
+        message: 'User with this pseudo already exists',
+      });
       canUserBeCreated = false;
-    } 
-    
-    if(canUserBeCreated) {
+    }
+
+    if (canUserBeCreated) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(reqBody.password, salt);
 
@@ -59,27 +59,28 @@ export const register = async (req: Request, res: Response) => {
         email: reqBody.email.toLowerCase(),
         password: hashedPassword,
         pseudo: reqBody.pseudo,
-        birthDate: reqBody.birthDate
+        birthDate: reqBody.birthDate,
+        firstName: reqBody.firstname,
       });
       //key from private key
       const privateKey = fs.readFileSync(new URL('../../../config/jwt/mykey.pem', import.meta.url), 'utf8');
 
-      const token = jwt.sign({ id: user.get('id'), email: reqBody.email, }, privateKey, {
+      const token = jwt.sign({id: user.get('id'), email: reqBody.email}, privateKey, {
         expiresIn: 86400,
-        algorithm: 'RS256'
+        algorithm: 'RS256',
       });
 
-      res.cookie('token', token).json({
+      res.status(200).cookie('token', token).json({
         message: 'User created',
         email: user.get('email'),
-        pseudo: user.get('pseudo')
+        pseudo: user.get('pseudo'),
       });
     }
   } catch (error) {
     res.status(500).json({
       message: 'Error creating user',
-      error
-    })
+      error,
+    });
     throw error;
   }
 };
@@ -89,15 +90,15 @@ export const login = async (req: Request, res: Response) => {
   try {
     const reqBody = {
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
     };
 
-    for(const [key, value] of Object.entries(reqBody)) {
-      if(!value) {
+    for (const [key, value] of Object.entries(reqBody)) {
+      if (!value) {
         userCanBeLogged = false;
         return res.status(400).json({
-          message: `The ${key} is required`
-        })
+          message: `The ${key} is required`,
+        });
       }
     }
 
@@ -106,48 +107,44 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await User.findOne({
       where: {
-        email: reqBody.email.toLowerCase()
-      }
+        email: reqBody.email.toLowerCase(),
+      },
     });
-    // @ts-ignore
-    const passwordIsValid = bcrypt.compare(reqBody.password, user.password as string);
-    
 
-    if(!user) {
-      res.status(404).json({
-        message: 'User not found'
-      })
+    if (!user) {
       userCanBeLogged = false;
-    } 
-
-    if(!passwordIsValid) {
-      res.status(401).json({
-        message: 'Invalid password'
-      })
-      userCanBeLogged = false;
-    } 
-
-    if(userCanBeLogged) {
-      console.log(passwordIsValid)
-      // @ts-ignore
-      const token = jwt.sign({ id: user?.id, email: user?.email, role: user?.role}, privateKey, {
-        expiresIn: 86400, // 24 hours
-        algorithm: 'RS256'
+      return res.status(404).json({
+        message: 'User not found',
       });
-  
-      res.cookie('token', token).json({
-        message: 'User logged in',
-        email: user?.get('email'),
-        pseudo: user?.get('pseudo'),
-        token
+    }
+    // @ts-ignore
+    const passwordIsValid = await bcrypt.compare(reqBody.password, user.password as string);
+
+    if (!passwordIsValid) {
+      userCanBeLogged = false;
+      return res.status(401).json({
+        message: 'Invalid password',
       });
     }
 
+    if (userCanBeLogged) {
+      // @ts-ignore
+      const token = jwt.sign({id: user?.id, email: user?.email, role: user?.role}, privateKey, {
+        expiresIn: 86400, // 24 hours
+        algorithm: 'RS256',
+      });
+
+      return res.cookie('token', token).json({
+        message: 'User logged in',
+        email: user?.get('email'),
+        pseudo: user?.get('pseudo'),
+        token,
+      });
+    }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Error logging in user',
-      error
-    })
-    throw error;
+      error,
+    });
   }
 };

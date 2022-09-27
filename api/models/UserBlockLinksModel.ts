@@ -3,21 +3,20 @@ import sequelize from '../database/Connection.js';
 
 const {INTEGER} = DataTypes;
 
-export const UserConversationLinks = sequelize.define(
-  'UserConversationLinks',
+export const UserBlockLinks = sequelize.define(
+  'UserBlockLinks',
   {
-    userId: {
+    blockerId: {
       type: INTEGER,
       allowNull: false,
     },
-    conversationId: {
+    blockedId: {
       type: INTEGER,
       allowNull: false,
     },
   },
   {
-    tableName: 'user_conversation_links',
+    tableName: 'user_block_links',
     underscored: true,
-    timestamps: false,
   },
 );

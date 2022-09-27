@@ -1,4 +1,4 @@
-import sequelize from "../../database/Connection.js";
+import sequelize from '../../database/Connection.js';
 
 export const createRelationBetweenUsersAndConversation = async (users: string[], conversationId: number) => {
   try {
@@ -6,7 +6,7 @@ export const createRelationBetweenUsersAndConversation = async (users: string[],
     for (const user of users) {
       const res = await sequelize.models.UserConversationLinks.create({
         userId: user,
-        conversationId
+        conversationId,
       });
       conv.push(res);
     }
@@ -19,7 +19,7 @@ export const createRelationBetweenUsersAndConversation = async (users: string[],
 
 export const getConversationBetweenUsers = async (conversationId: number) => {
   try {
-    const conversation = await sequelize.models.UserConversationLinks.findByPk(conversationId)
+    const conversation = await sequelize.models.UserConversationLinks.findByPk(conversationId);
     return conversation;
   } catch (error) {
     console.error(error);

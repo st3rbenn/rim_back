@@ -1,10 +1,10 @@
-import sequelize from "../../database/Connection.js";
+import sequelize from '../../database/Connection.js';
 
 export const createRelationsBetweenUserAndPost = async (userId: number, postId: number) => {
   try {
     const res = await sequelize.models.UserPostLinks.create({
       userId,
-      postId
+      postId,
     });
     return res;
   } catch (error) {
