@@ -15,6 +15,9 @@ import UserType from '../../types/UserType.js';
 import {UserBlockLinks} from '../models/UserBlockLinksModel.js';
 import {UserFollowLinks} from '../models/UserFollowLinksModel.js';
 import { promises as fs } from 'fs';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export const findAllUsers = async (req: Request, res: Response) => {
   let canFindAllUser = true;
@@ -136,7 +139,7 @@ export const editUser = async (req: Request, res: Response) => {
       const cwd = process.cwd();
       
       await fs.writeFile(`${cwd}/assets/uploads/${name}`, data);
-      currentBodyValues.avatar = name;
+      currentBodyValues.avatar = `${process.env.UPLOAD_URL_PROVIDER}${name}`;
     }
 
     if(currentBodyValues.email) {
@@ -179,9 +182,34 @@ export const editUser = async (req: Request, res: Response) => {
         },
       );
 
+      const nbFollowers = await UserFollowLinks.count({
+        where: {
+          followedId: reqBody.userId,
+        },
+      });
+  
+      const nbFollowed = await UserFollowLinks.count({
+        where: {
+          followerId: reqBody.userId,
+        },
+      });
+
+      const findUser = await User.findOne({
+        where: {
+          id: user,
+        },
+        attributes: {
+          exclude: ['password'],
+        },
+      });
+
       res.status(200).json({
         message: 'User updated successfully',
-        user,
+        user: {
+          ...findUser?.get(),
+          nbFollowers, 
+          nbFollowed,
+        },
       });
     }
   } catch (error) {

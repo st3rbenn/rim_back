@@ -35,7 +35,7 @@ app.use(compression({
 app.use(helmet({
   contentSecurityPolicy: false,
 }));
-
+app.use('/assets/uploads', express.static('assets/uploads'));
 // adding cors middleware
 app.use(cors({}));
 

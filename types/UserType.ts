@@ -6,7 +6,7 @@ export default interface UserType extends Model<typeof User> {
   id?: number,
   email?: string,
   password?: string,
-  firstName?: string,
+  name?: string,
   pseudo?: string,
   avatar?: string,
   biography?: string,

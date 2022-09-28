@@ -20,7 +20,7 @@ export const User = sequelize.define(
       type: STRING(255),
       allowNull: false,
     },
-    firstName: {
+    name: {
       type: STRING(50),
       allowNull: false,
     },

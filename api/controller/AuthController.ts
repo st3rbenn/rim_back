@@ -12,7 +12,7 @@ export const register = async (req: Request, res: Response) => {
       email: req.body.email,
       password: req.body.password,
       pseudo: req.body.pseudo,
-      firstname: req.body.firstname,
+      name: req.body.name,
       birthDate: req.body.birthDate,
     };
 
@@ -60,7 +60,7 @@ export const register = async (req: Request, res: Response) => {
         password: hashedPassword,
         pseudo: reqBody.pseudo,
         birthDate: reqBody.birthDate,
-        firstName: reqBody.firstname,
+        name: reqBody.name,
       });
       //key from private key
       const privateKey = fs.readFileSync(new URL('../../../config/jwt/mykey.pem', import.meta.url), 'utf8');

@@ -35,7 +35,7 @@ export default async function db() {
     ];
 
     for (let model of models) {
-      await model.sync({alter: true});
+      await model.sync({alter: false});
       console.log(`🛫 [sequelize]: ✅ Model ${model.name} synced successfully.`);
       console.log('🛫 [sequelize]: 🤌 All models synced successfully.');
     }
@@ -78,7 +78,7 @@ export default async function db() {
     //add the possibility to store emojis in the database
     await sequelize.query('SET NAMES utf8mb4');
 
-    await sequelize.sync({alter: true});
+    await sequelize.sync({alter: false});
 
     console.log('🛫 [sequelize]: 🤌 All associations synced successfully.');
     console.log(`
