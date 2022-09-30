@@ -1,31 +1,35 @@
 import {User} from '../models/UserModel.js';
-import jwt from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 import {NextFunction, Request, Response} from 'express';
 import * as fs from 'fs';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export const isAuthtenticated = async (req: Request, res: Response, next: NextFunction) => {
-  const authHeaderFromCookie = req.cookies['token'];
-  const authHeaderFromHeader = req.headers['x-access-token'] || req.body.headers;
+  const token = req?.headers['authorization']?.split(' ')[1]; // Authorization: 'Bearer TOKEN'
   let userAuth: boolean = true;
+  console.log(token);
 
   try {
-    if (!authHeaderFromCookie || !authHeaderFromHeader) {
+    if (!token) {
       userAuth = false;
       return res.status(403).json({
         message: 'No token provided',
       });
     }
-
+    if (!token) {
+      throw new Error('Authentication failed!');
+    }
     //key from private key
-    const privateKey = fs.readFileSync(new URL('../../../config/jwt/mykey.pem', import.meta.url), 'utf8');
-    const decoded = jwt.verify(authHeaderFromCookie as string || authHeaderFromHeader as string, privateKey, {
-      algorithms: ['RS256'],
-    });
+    const publicKey = fs.readFileSync(new URL('../../../config/jwt/pubkey.pem', import.meta.url), 'utf8');
+
+    const verified = jwt.verify(token, publicKey);
 
     const user = await User.findOne({
       where: {
         // @ts-ignore
-        id: decoded.id,
+        id: verified.id,
       },
     });
     if (!user) {
@@ -38,6 +42,7 @@ export const isAuthtenticated = async (req: Request, res: Response, next: NextFu
       next();
     }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       message: 'Failed to authenticate token',
       error,

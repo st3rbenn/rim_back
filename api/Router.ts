@@ -3,6 +3,7 @@ import UserRouter from './routes/UserRoutes.js';
 import ConversationRouter from './routes/ConversationRoutes.js';
 import PostRouter from './routes/PostRoutes.js';
 import AuthRouter from './routes/AuthRoutes.js';
+import UploadProvider from './providers/UploadProvider.js';
 import {isAuthtenticated} from './middleware/authJwt.js';
 
 const Router: Express = express();
@@ -14,6 +15,8 @@ Router.use('/post', isAuthtenticated, PostRouter);
 Router.use('/conversation', isAuthtenticated, ConversationRouter);
 
 Router.use('/user', isAuthtenticated, UserRouter);
+
+Router.use('/upload', isAuthtenticated, UploadProvider);
 
 Router.use('/', (req: Request, res: Response) => {
   res.status(200).json({

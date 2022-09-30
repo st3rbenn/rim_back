@@ -115,7 +115,6 @@ export const editUser = async (req: Request, res: Response) => {
   let currentBodyValues: editUserType = {};
   try {
     const reqBody: editUserType = req.body;
-
     if (!reqBody.userId) {
       canUserBeEdited = false;
       return res.status(400).json({
@@ -131,15 +130,6 @@ export const editUser = async (req: Request, res: Response) => {
 
     if(currentBodyValues.password) {
       currentBodyValues.password = await Bcrypt.hash(currentBodyValues.password, 10);
-    }
-
-    if(req.files) {
-      // @ts-ignore
-      const { name, data } = req.files.avatar;
-      const cwd = process.cwd();
-      
-      await fs.writeFile(`${cwd}/assets/uploads/${name}`, data);
-      currentBodyValues.avatar = `${process.env.UPLOAD_URL_PROVIDER}${name}`;
     }
 
     if(currentBodyValues.email) {
@@ -173,7 +163,8 @@ export const editUser = async (req: Request, res: Response) => {
     }
 
     if (canUserBeEdited) {
-      const user = await User.update(
+
+      await User.update(
         currentBodyValues,
         {
           where: {
@@ -196,14 +187,14 @@ export const editUser = async (req: Request, res: Response) => {
 
       const findUser = await User.findOne({
         where: {
-          id: user,
+          id: reqBody.userId,
         },
         attributes: {
           exclude: ['password'],
         },
       });
 
-      res.status(200).json({
+      return res.status(200).json({
         message: 'User updated successfully',
         user: {
           ...findUser?.get(),

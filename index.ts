@@ -6,7 +6,6 @@ import cors from 'cors';
 import db from './api/sequelize.js';
 import Router from './api/Router.js';
 import cookieParser from 'cookie-parser';
-import fileUpload from 'express-fileupload';
 
 dotenv.config();
 
@@ -41,9 +40,6 @@ app.use(cors({}));
 
 // adding cookie parser middleware
 app.use(cookieParser());
-
-// adding file upload middleware
-app.use(fileUpload());
 
 // adding body parser middleware
 app.use(express.json());

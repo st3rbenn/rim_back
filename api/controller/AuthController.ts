@@ -1,9 +1,12 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, {Secret} from 'jsonwebtoken';
 import UserType from '../../types/UserType';
 import {Request, Response} from 'express';
 import {User} from '../models/UserModel.js';
 import * as fs from 'fs';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export const register = async (req: Request, res: Response) => {
   let canUserBeCreated = true;
@@ -38,17 +41,17 @@ export const register = async (req: Request, res: Response) => {
     });
 
     if (sameEmail) {
-      res.status(409).json({
+      canUserBeCreated = false;
+      return res.status(409).json({
         message: 'User with this email already exists',
       });
-      canUserBeCreated = false;
     }
 
     if (samePseudo) {
-      res.status(409).json({
+      canUserBeCreated = false;
+      return res.status(409).json({
         message: 'User with this pseudo already exists',
       });
-      canUserBeCreated = false;
     }
 
     if (canUserBeCreated) {
@@ -62,22 +65,15 @@ export const register = async (req: Request, res: Response) => {
         birthDate: reqBody.birthDate,
         name: reqBody.name,
       });
-      //key from private key
-      const privateKey = fs.readFileSync(new URL('../../../config/jwt/mykey.pem', import.meta.url), 'utf8');
 
-      const token = jwt.sign({id: user.get('id'), email: reqBody.email}, privateKey, {
-        expiresIn: 86400,
-        algorithm: 'RS256',
-      });
-
-      res.status(200).cookie('token', token).json({
+      return res.status(200).json({
         message: 'User created',
         email: user.get('email'),
         pseudo: user.get('pseudo'),
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Error creating user',
       error,
     });
@@ -102,9 +98,6 @@ export const login = async (req: Request, res: Response) => {
       }
     }
 
-    //key from private key
-    const privateKey = fs.readFileSync(new URL('../../../config/jwt/mykey.pem', import.meta.url), 'utf8');
-
     const user = await User.findOne({
       where: {
         email: reqBody.email.toLowerCase(),
@@ -128,20 +121,31 @@ export const login = async (req: Request, res: Response) => {
     }
 
     if (userCanBeLogged) {
-      // @ts-ignore
-      const token = jwt.sign({id: user?.id, email: user?.email, role: user?.role}, privateKey, {
-        expiresIn: 86400, // 24 hours
-        algorithm: 'RS256',
-      });
+      //key from private key
+      const privateKey = fs.readFileSync(new URL('../../../config/jwt/mykey.pem', import.meta.url), 'utf8');
 
-      return res.cookie('token', token).json({
-        message: 'User logged in',
-        email: user?.get('email'),
-        pseudo: user?.get('pseudo'),
-        token,
-      });
+      const token = jwt.sign(
+        // @ts-ignore
+        {id: user?.id, email: user?.email, role: user?.role},
+        privateKey,
+        {
+          algorithm: 'RS256',
+          expiresIn: 86400, // 24 hours
+        },
+      );
+
+      return res
+        .status(200)
+        .cookie('token', token)
+        .json({
+          message: 'User logged in',
+          email: user?.get('email'),
+          pseudo: user?.get('pseudo'),
+          token,
+        });
     }
   } catch (error) {
+    console.log('log in : ', error);
     return res.status(500).json({
       message: 'Error logging in user',
       error,
