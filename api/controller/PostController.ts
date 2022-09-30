@@ -74,9 +74,9 @@ export const findPostById = async (req: Request, res: Response) => {
 export const findPostsByUserId = async (req: Request, res: Response) => {
   let canFindPostByUserId = true;
   try {
-    const {userId} = req.body;
+    const {id} = req.params;
 
-    if (!userId) {
+    if (!id) {
       canFindPostByUserId = false;
       return res.status(400).json({
         message: `Missing parameters : user id`,
@@ -85,7 +85,7 @@ export const findPostsByUserId = async (req: Request, res: Response) => {
 
     const posts = await UserPostLinks.findAll({
       where: {
-        userId: userId,
+        userId: id,
       },
     });
 
@@ -109,7 +109,7 @@ export const findPostsByUserId = async (req: Request, res: Response) => {
 
       res.status(200).json({
         message: 'Posts retrieved successfully',
-        allPosts,
+        posts: allPosts,
       });
     }
   } catch (error) {

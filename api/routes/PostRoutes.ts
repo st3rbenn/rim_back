@@ -11,7 +11,7 @@ import {
 const PostRouter: Express = express();
 
 PostRouter.get('/', findAllPosts)
-  .get('/user', findPostsByUserId)
+  .get('/user/:id', findPostsByUserId)
   .get('/:id', findPostById)
   .post('/', createPost)
   .put('/', editPost)
