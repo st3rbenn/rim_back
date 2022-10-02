@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt, {Secret} from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import UserType from '../../types/UserType';
 import {Request, Response} from 'express';
 import {User} from '../models/UserModel.js';

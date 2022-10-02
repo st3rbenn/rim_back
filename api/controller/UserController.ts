@@ -12,9 +12,7 @@ import {User} from '../models/UserModel.js';
 import {UserConversationLinks} from '../models/UserConversationLinksModel.js';
 import {Conversation} from '../models/ConversationModel.js';
 import UserType from '../../types/UserType.js';
-import {UserBlockLinks} from '../models/UserBlockLinksModel.js';
 import {UserFollowLinks} from '../models/UserFollowLinksModel.js';
-import { promises as fs } from 'fs';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -115,6 +113,7 @@ export const editUser = async (req: Request, res: Response) => {
   let currentBodyValues: editUserType = {};
   try {
     const reqBody: editUserType = req.body;
+    console.log(req);
     if (!reqBody.userId) {
       canUserBeEdited = false;
       return res.status(400).json({

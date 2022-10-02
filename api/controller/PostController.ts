@@ -1,4 +1,3 @@
-import sequelize from '../database/Connection.js';
 import {Request, Response} from 'express';
 import {createRelationsBetweenUserAndPost} from '../services/relations/UserPostServices.js';
 import {Post} from '../models/PostModel.js';
