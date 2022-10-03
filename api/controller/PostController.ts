@@ -3,6 +3,7 @@ import {createRelationsBetweenUserAndPost} from '../services/relations/UserPostS
 import {Post} from '../models/PostModel.js';
 import {UserPostLinks} from '../models/UserPostLinksModel.js';
 import {User} from '../models/UserModel.js';
+import { Op } from 'sequelize';
 
 export const findAllPosts = async (req: Request, res: Response) => {
   let canAllPostsBeFound = true;
@@ -113,15 +114,19 @@ export const findPostsByUserId = async (req: Request, res: Response) => {
             id: Object(post).dataValues.postId,
           },
         });
-        allPosts.push({
-          post: postFound,
-        });
+        allPosts.push(postFound);
       }
+
+      allPosts.sort((a: any, b: any) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+
+      console.log('tout les posts : ', allPosts);
 
       res.status(200).json({
         message: 'Posts retrieved successfully',
         user: user,
-        allPosts,
+        posts: allPosts,
       });
     }
   } catch (error) {

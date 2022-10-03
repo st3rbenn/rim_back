@@ -76,6 +76,10 @@ export const findOneById = async (req: Request, res: Response) => {
       posts.push(postFound);
     }
 
+    posts.sort((a: any, b: any) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
     if (!user) {
       canUserBeFoundById = false;
       return res.status(404).json({
