@@ -2,6 +2,7 @@ import {Request, Response} from 'express';
 import {createRelationsBetweenUserAndPost} from '../services/relations/UserPostServices.js';
 import {Post} from '../models/PostModel.js';
 import {UserPostLinks} from '../models/UserPostLinksModel.js';
+import {User} from '../models/UserModel.js';
 
 export const findAllPosts = async (req: Request, res: Response) => {
   let canAllPostsBeFound = true;
@@ -72,6 +73,7 @@ export const findPostById = async (req: Request, res: Response) => {
 
 export const findPostsByUserId = async (req: Request, res: Response) => {
   let canFindPostByUserId = true;
+  const allPosts: any = [];
   try {
     const {id} = req.params;
 
@@ -95,20 +97,31 @@ export const findPostsByUserId = async (req: Request, res: Response) => {
       });
     }
 
+    const user = await User.findOne({
+      where: {
+        id: id,
+      },
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt', 'email', 'biography', 'role'],
+      },
+    });
+
     if (canFindPostByUserId) {
-      const allPosts: any = [];
       for (const post of posts) {
         const postFound = await Post.findOne({
           where: {
             id: Object(post).dataValues.postId,
           },
         });
-        allPosts.push(postFound);
+        allPosts.push({
+          post: postFound,
+        });
       }
 
       res.status(200).json({
         message: 'Posts retrieved successfully',
-        posts: allPosts,
+        user: user,
+        allPosts,
       });
     }
   } catch (error) {

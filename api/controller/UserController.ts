@@ -14,6 +14,8 @@ import {Conversation} from '../models/ConversationModel.js';
 import UserType from '../../types/UserType.js';
 import {UserFollowLinks} from '../models/UserFollowLinksModel.js';
 import * as dotenv from 'dotenv';
+import { Post } from '../models/PostModel.js';
+import { UserPostLinks } from '../models/UserPostLinksModel.js';
 
 dotenv.config();
 
@@ -46,6 +48,7 @@ export const findAllUsers = async (req: Request, res: Response) => {
 
 export const findOneById = async (req: Request, res: Response) => {
   let canUserBeFoundById = true;
+  let posts: any = [];
   try {
     const {userId} = req.params;
 
@@ -57,6 +60,21 @@ export const findOneById = async (req: Request, res: Response) => {
         exclude: ['password'],
       },
     });
+
+    const allPosts = await UserPostLinks.findAll({
+      where: {
+        userId: userId,
+      },
+    });
+
+    for (const post of allPosts) {
+      const postFound = await Post.findOne({
+        where: {
+          id: Object(post).dataValues.postId,
+        },
+      });
+      posts.push(postFound);
+    }
 
     if (!user) {
       canUserBeFoundById = false;
@@ -84,8 +102,8 @@ export const findOneById = async (req: Request, res: Response) => {
           ...user.get(),
           nbFollowers, 
           nbFollowed,
-        }, 
-        
+        },
+        posts,
       });
     }
   } catch (error) {
